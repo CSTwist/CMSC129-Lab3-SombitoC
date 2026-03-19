@@ -1,0 +1,196 @@
+/***** AUTH FORM CSS *****/
+
+/* FONTS
+* > IM FELL Double Pica
+* > Montserrat
+*/
+@import url('https://fonts.googleapis.com/css2?family=IM+Fell+DW+Pica:ital@0;1&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+
+/* APP COLORS */
+:root {
+  --coffee: #7F5539;
+  --toffee-brown: #9C6644;
+  --copper: #B08968;
+  --tan: #DDB892;
+  --paleoak: #E6CCB2;
+  --cream: #EDE0D4;
+}
+
+.auth-container {
+    padding: 0;
+    overflow: hidden;
+}
+
+.auth-content-wrapper {
+    width: 100%;
+    max-width: 460px;
+    padding: 10px;
+}
+
+.vh-100 {
+    min-height: 100vh;
+}
+
+.bg-image {
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.auth-form p {
+    color: var(--coffee);
+    font-size: 15px;
+    font-weight: 400;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.logo {
+    width: 50px;
+    height: 50px;
+    border-radius: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.header-logo-img {
+    height: 60px; /* Adjust size as needed */
+    border-radius: 50px;
+    width: auto;
+    object-fit: contain;
+    /* Optional: add a slight shadow to match the title text */
+    filter: drop-shadow(0 4px 4px rgba(0, 0, 0, 0.25));
+}
+
+.auth-title-header {
+    display: flex;
+    width: 174px;
+    height: 72px;
+    flex-direction: column;
+    justify-content: center;
+    color: var(--coffee);
+    text-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
+    font-family: "IM FELL DW Pica", serif;
+    font-size: 28px;
+    font-style: italic;
+    font-weight: 500;
+    line-height: normal;
+
+}
+
+.auth-form-panel {
+    background-color: var(--cream);
+    height: 100vh;
+    font-family: 'Montserrat', 'IM Fell DW Pica', system-ui, Avenir, Helvetica, Arial, sans-serif;
+    color: var(--coffee);
+}
+
+p.auth-subtitle {
+    color: var(--toffee-brown) !important;
+}
+
+.auth-header {
+    display: flex;
+    width: 456px;
+    height: 63px;
+    flex-direction: column;
+    justify-content: center;
+    color: var(--coffee);
+    font-family: "IM FELL DW Pica";
+    font-size: 38px;
+    font-style: italic;
+    font-weight: 500;
+    line-height: normal;
+}
+
+.auth-form .form-control {
+    background-color: var(--tan) !important;
+    border: none;
+    border-radius: 12px;
+    padding: 12px 16px;
+    color: var(--coffee);
+    font-size: 1rem;
+}
+
+.form-control {
+    margin-bottom: 1rem;
+}
+
+
+.auth-form .form-control::placeholder {
+    color: var(--toffee-brown);
+}
+
+.auth-form .form-control:focus {
+    background-color: var(--tan);
+    box-shadow: 0 0 0 2px rgba(156, 102, 68, 0.6);
+    color: var(--coffee)!important;
+}
+
+.auth-btn {
+    display: flex;
+    width: 400px;
+    height: 55px;
+    padding: 36px 99px;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    border-radius: 10px;
+    background: var(--Toffee-Brown, #9C6644);
+    box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.25);
+    border: none !important;
+    font-size: 19px;
+    font-weight: 600;
+}
+
+.auth-btn:hover {
+    background: var(--coffee) !important;
+    color: white;
+}
+
+.auth-btn:focus,
+.auth-btn:active,
+.auth-btn:focus-visible,
+.btn-primary.auth-btn:hover,
+.btn-primary.auth-btn:focus,
+.btn-primary.auth-btn:active,
+.btn-primary.auth-btn:active:focus,
+.btn-primary.auth-btn:active:hover,
+.btn-primary.auth-btn:focus-visible {
+    background-color: var(--coffee) !important;
+    border-color: var(--coffee) !important;
+    color: white !important;
+    box-shadow: 0 0 0 0.25rem rgba(183, 122, 84, 0.9) !important;
+    cursor: pointer;
+}
+
+.forgot-psd {
+    color: #9C6644;
+    text-align: center;
+    font-family: Montserrat;
+    font-size: 12px;
+    font-style: italic;
+    font-weight: 400;
+    line-height: normal;
+    margin-left: 70%;
+}
+
+.forgot-psd:hover,
+.auth-link {
+    color: #9C6644;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.auth-form .form-control:-webkit-autofill,
+.auth-form .form-control:-webkit-autofill:hover,
+.auth-form .form-control:-webkit-autofill:focus,
+.auth-form .form-control:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 30px var(--tan) inset !important;
+    -webkit-text-fill-color: var(--coffee) !important;
+    transition: background-color 5000s ease-in-out 0s;
+}
+
+.auth-form .form-control:-webkit-autofill:focus {
+    box-shadow: 0 0 0 2px rgba(156, 102, 68, 0.6), 0 0 0 30px var(--tan) inset !important;
+}
