@@ -1,21 +1,30 @@
 /***** AUTH FORM CSS *****/
 
 /* FONTS
-* > IM FELL Double Pica
-* > Montserrat
+*
+* Montserrat
 */
 @import url('https://fonts.googleapis.com/css2?family=IM+Fell+DW+Pica:ital@0;1&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
 
 /* APP COLORS */
 :root {
-  --white_blue: #c4d1e0;
-  --dirty_white: #f2f0ed;
-  --lavender: #8E7BEF;
-  --dark-purple: #7B6FE5;
+    --white_blue: #c4d1e0;
+    --dirty_white: #f2f0ed;
+    --navy-text: #153B50;
+    --cream-card: #ECEBE4;
+    --pink-btn: #FFD3E7;
+    --lavender-btn: #DAB3F3;
+    --dark-purple: #7B6FE5;
+    --teal: #429EA6;
+    --bg-color: #CFDCE3;
+}
+
+body, h1, h2, h3, h4, h5, h6, p, a, button, input, label {
+  font-family: 'Montserrat', sans-serif !important;
 }
 
 .login-auth-page {
-    background-color: var(--white_blue);
+    background-color: var(--bg-color);
     min-height: 100vh;
 }
 
@@ -118,7 +127,7 @@
     align-items: center;
     gap: 10px;
     border-radius: 10px;
-    background: var(--lavender, #7B6FE5);
+    background: var(--dark-purple, #7B6FE5);
     box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.25);
     border: none !important;
     font-size: 19px;
@@ -126,7 +135,7 @@
 }
 
 .auth-btn:hover {
-    background: var(--lavender) !important;
+    background: var(--dark-purple) !important;
     color: white;
 }
 

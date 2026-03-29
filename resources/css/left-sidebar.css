@@ -50,3 +50,7 @@
 .sign-out-container {
     padding-top: 15px;
 }
+
+.sign-out-container button.nav-link {
+    background-color: transparent;
+}

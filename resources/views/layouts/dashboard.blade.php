@@ -8,7 +8,7 @@
         <div class="d-flex align-items-center">
             <x-left-sidebar />
         </div>
-
+        
         {{-- Main Content Area --}}
         <div class="main-container flex-grow-1">
 

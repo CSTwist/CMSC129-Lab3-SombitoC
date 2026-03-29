@@ -1,53 +1,55 @@
 /***** SEARCH BAR COMPONENT CSS *****/
 
-/* APP COLORS */
-:root {
-  --lavender: #8E7BEF;
-  --dark-purple: #7B6FE5;
-  --light-purple: #e6cae6;
-  --light-lavender: #E0DBF9;
-  --cream: #f0e7dd;
-}
-
 .search-bar {
     display: flex;
     width: 274px;
-    padding: 8px 14px;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
 }
 
-/* Apply the soft shadow to the main input group */
 .search-input {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    border-radius: 30px;
-    border: none;
+    display: flex;
+    width: 100%;
+    border-radius: 50px;
+    border: 1.5px solid transparent;
+    background-color: #ECEBE4;
+    box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.50);
+    align-items: center;
+    overflow: hidden;
+    transition: border 0.2s ease-in-out;
 }
 
-.search-input-field, .search-icon-wrapper {
-    background-color: var(--light-purple) !important;
-    border: none;
+.search-input:focus-within {
+    border: 1.5px solid #153B50;
 }
 
 .search-icon-wrapper {
-    border-top-left-radius: 30px !important;
-    border-bottom-left-radius: 30px !important;
-    padding-left: 18px;
+    background-color: transparent !important;
+    border: none !important;
+    padding-left: 18px !important;
+    color: #153B50;
+}
+
+.search-icon {
+    font-size: 1rem;
 }
 
 .search-input-field {
-    border-top-right-radius: 30px !important;
-    border-bottom-right-radius: 30px !important;
-    padding-right: 18px;
+    background-color: transparent !important;
+    border: none !important;
+    color: #153B50;
+    font-size: 16px;
+    padding-top: 4px !important;
+    padding-bottom: 4px !important;
+    padding-left: 10px !important;
+    padding-right: 18px !important;
+}
+
+.search-input-field::placeholder {
+    color: #153B50;
+    opacity: 0.7;
 }
 
 .search-input-field:focus {
     box-shadow: none !important;
-    background-color: var(--light-purple) !important;
-}
-
-.search-input input {
-    margin-bottom: 0;
+    background-color: transparent !important;
+    outline: none;
 }

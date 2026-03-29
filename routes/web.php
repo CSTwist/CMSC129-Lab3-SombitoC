@@ -24,3 +24,13 @@ Route::get('/journals/create', [JournalController::class, 'create'])->name('jour
 Route::post('/journals', [JournalController::class, 'store'])->name('journals/store');
 Route::put('/journals/{id}', [JournalController::class, 'update'])->name('journals/update');
 Route::delete('/journals/{id}', [JournalController::class, 'destroy'])->name('journals/delete');
+
+// profile
+Route::get('/profile', function () {
+    return view('layouts.profile');
+})->name('profile');
+
+// recently deleted
+Route::get('/recently-deleted', function () {
+    return view('layouts.recently-deleted');
+})->name('recently-deleted');

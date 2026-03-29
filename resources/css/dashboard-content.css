@@ -1,26 +1,31 @@
 /**** NEW DASHBOARD LAYOUT CSS ****/
 
 :root {
-  --white_blue: #c4d1e0;
-  --lavender: #8E7BEF;
-  --dark-purple: #7B6FE5;
-  --light-lavender: #E0DBF9;
-  --cream: #f0e7dd;
+  --navy-text: #153B50;
+  --cream-card: #ECEBE4;
+  --pink-btn: #FFD3E7;
+  --lavender-btn: #DAB3F3;
+  --teal: #429EA6;
+  --bg-color: #CFDCE3;
+}
+
+body, h1, h2, h3, h4, h5, h6, p, a, button, input, label {
+  font-family: 'Montserrat', sans-serif !important;
 }
 
 body {
-    background-color: var(--white_blue);
+    background-color: var(--bg-color);
 }
 
 /* Main Area */
 .main-container {
-    background-color: var(--white_blue);
+    background-color: var(--cream-card);
 }
 
 /* App Header */
 .app-header {
     height: 80px;
-    background-color: white;
+    background-color: var(--cream-card);
     box-shadow: 0 2px 10px rgba(0,0,0,0.05);
 }
 
@@ -28,7 +33,7 @@ body {
 .profile-placeholder {
     width: 40px;
     height: 40px;
-    background-color: var(--lavender);
+    background-color: var(--lavender-btn);
     color: white;
     border-radius: 50%;
     display: flex;
@@ -57,7 +62,7 @@ body {
 
 /* Journal Entry Partial Update */
 .journal-entry-card {
-    background-color: white;
+    background-color: var(--cream-card);
     border: none;
     border-radius: 12px;
     box-shadow: 0 4px 6px rgba(0,0,0,0.05);
@@ -71,7 +76,7 @@ body {
 }
 
 .journal-summary-card {
-    background-color: white;
+    background-color: var(--cream-card);
     border-radius: 12px;
     box-shadow: 0 4px 6px rgba(0,0,0,0.05);
 }
