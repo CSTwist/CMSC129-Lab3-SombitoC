@@ -1,0 +1,82 @@
+/**** PROFILE PAGE CSS ****/
+
+:root {
+    --navy-text: #153B50;
+    --cream-card: #ECEBE4;
+    --pink-btn: #FFD3E7;
+    --lavender-btn: #DAB3F3;
+    --teal: #429EA6;
+    --bg-color: #CFDCE3;
+}
+
+body, h1, h2, h3, h4, h5, h6, p, a, button, input, label {
+    font-family: 'Montserrat', sans-serif !important;
+}
+
+body, .main-container, .login-auth-page {
+    background-color: var(--bg-color) !important;
+}
+
+.page-header-title {
+    color: var(--navy-text);
+    font-weight: 700;
+    font-size: 2.2rem;
+    margin-bottom: 20px;
+}
+
+.profile-card {
+    background-color: var(--cream-card);
+    border-radius: 20px;
+    padding: 40px;
+    border: none;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.profile-label {
+    color: var(--navy-text);
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+}
+
+.profile-input {
+    border-radius: 12px;
+    border: 1px solid #757575;
+    padding: 10px 15px;
+    background-color: transparent;
+}
+
+.profile-input:disabled {
+    background-color: transparent;
+    color: #333;
+}
+
+.btn-purple {
+    background-color: var(--lavender-btn);
+    color: var(--navy-text);
+    border-radius: 20px;
+    font-weight: 500;
+    padding: 8px 20px;
+    border: none;
+    box-shadow: 0 4px 4px rgba(0,0,0,0.15);
+}
+
+.btn-pink {
+    background-color: var(--pink-btn);
+    color: var(--navy-text);
+    border-radius: 20px;
+    font-weight: 500;
+    padding: 8px 20px;
+    border: none;
+    box-shadow: 0 4px 4px rgba(0,0,0,0.15);
+}
+
+.btn-gray {
+    background-color: #CFCFCF;
+    color: var(--navy-text);
+    border-radius: 20px;
+    font-weight: 600;
+    padding: 8px 20px;
+    border: none;
+    box-shadow: 0 4px 4px rgba(0,0,0,0.15);
+}
