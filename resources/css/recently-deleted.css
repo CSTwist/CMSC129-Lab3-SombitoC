@@ -6,6 +6,8 @@
     --pink-btn: #FFD3E7;
     --lavender-btn: #DAB3F3;
     --teal: #429EA6;
+    --danger-red: #E07A5F;
+    --warning-bg: rgba(0,0,0,0.05);
 }
 
 body, h1, h2, h3, h4, h5, h6, p, a, button, input, label {
@@ -21,6 +23,7 @@ body, h1, h2, h3, h4, h5, h6, p, a, button, input, label {
     justify-content: space-between;
     align-items: center;
     box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    border: 1px solid var(--navy-text);
 }
 
 .btn-danger-custom {
@@ -30,6 +33,17 @@ body, h1, h2, h3, h4, h5, h6, p, a, button, input, label {
     border: none;
     padding: 6px 20px;
     font-weight: 500;
+}
+
+.btn-pink {
+    background-color: var(--pink-btn);
+    color: var(--navy-text);
+    font-weight: 500;
+}
+
+.btn-pink:hover {
+    background-color: #f0b8d3;
+    color: var(--navy-text);
 }
 
 .month-divider {
@@ -109,6 +123,6 @@ body, h1, h2, h3, h4, h5, h6, p, a, button, input, label {
 
 .empty-trash-icon {
     font-size: 3rem;
-    color: var(--teal-accent);
+    color: var(--navy-text);
     margin-bottom: 15px;
 }
