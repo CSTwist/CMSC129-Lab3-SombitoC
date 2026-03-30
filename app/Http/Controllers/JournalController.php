@@ -48,7 +48,7 @@ class JournalController extends Controller
         });
 
         if ($request->ajax()) {
-            return view('partials.journal-list', [
+            return view('components/journal-list', [
                 'journals' => $allUserJournals,
                 'groupedJournals' => $groupedJournals,
                 'isLoading' => false
@@ -71,6 +71,7 @@ class JournalController extends Controller
 
     public function store(Request $request)
     {
+        // 1. Added validation for the new fields
         $request->validate([
             'title' => 'required|string|max:255',
             'content' => 'required|string',
@@ -80,8 +81,8 @@ class JournalController extends Controller
         Journal::create([
             'title' => $request->title,
             'content' => $request->content,
-            'mood' => $request->mood,
-            'is_favorite' => $request->has('is_favorite'),
+            'mood' => $request->mood, // Save mood
+            'is_favorite' => $request->has('is_favorite'), // Checkboxes return true if checked
             'user_id' => Auth::id(),
         ]);
 
@@ -93,7 +94,7 @@ class JournalController extends Controller
         $journal = Journal::withTrashed()->findOrFail($id);
         $this->authorizeJournal($journal);
 
-        return view('journals/show', compact('journal'));
+        return view('journals/view-entry', compact('journal'));
     }
 
     public function edit($id)
@@ -119,8 +120,8 @@ class JournalController extends Controller
         $journal->update([
             'title' => $request->title,
             'content' => $request->content,
-            'mood' => $request->mood,
-            'is_favorite' => $request->has('is_favorite'),
+            'mood' => $request->mood, // Update mood
+            'is_favorite' => $request->has('is_favorite'), // Update favorite status
         ]);
 
         return redirect()->route('dashboard')->with('success', 'Journal updated!');
@@ -136,7 +137,7 @@ class JournalController extends Controller
         return redirect()->route('dashboard')->with('success', 'Journal moved to trash!');
     }
 
-    // TRASH FUNCTIONALITY
+    // --- TRASH FUNCTIONALITY ---
 
     public function trash(Request $request)
     {
