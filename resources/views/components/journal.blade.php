@@ -1,4 +1,5 @@
-<div class="journal-entry-card d-flex position-relative">
+{{-- Added cursor-pointer, a hover-effect class for feedback, and an onclick redirect event --}}
+<div class="journal-entry-card d-flex position-relative w-100" style="cursor: pointer; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.01)'" onmouseout="this.style.transform='scale(1)'" onclick="window.location.href='{{ route('journals/show', $journal->id) }}'">
 
     {{-- Left Date Box --}}
     <div class="journal-date-box d-flex flex-column align-items-center justify-content-center">
@@ -11,26 +12,21 @@
         <div class="d-flex justify-content-between align-items-start mb-2">
             <h5 class="journal-title mb-0">{{ $journal->title }}</h5>
 
-            {{-- Three-dot Dropdown Menu --}}
-            <div class="dropdown ms-3">
+            {{-- Added event.stopPropagation() so that clicking the dropdown doesn't trigger the card's redirect --}}
+            <div class="dropdown ms-3" onclick="event.stopPropagation();">
                 <button class="btn btn-link text-dark p-0 text-decoration-none shadow-none dropdown-toggle-kebab" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                     <i class="bi bi-three-dots-vertical" style="font-size: 1.2rem; color: var(--navy-text);"></i>
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end journal-dropdown-menu shadow-sm">
                     <li>
-                        {{-- Changed from triggering a modal to a standard link pointing to the new edit page --}}
                         <a href="{{ route('journals/edit', $journal->id) }}" class="dropdown-item journal-dropdown-item d-flex align-items-center gap-2 text-decoration-none" style="color: var(--navy-text);">
                             <i class="bi bi-pencil" style="font-size: 0.9rem;"></i> Edit
                         </a>
                     </li>
                     <li>
-                        <form action="{{ route('journals/delete', $journal->id) }}" method="POST" class="m-0 p-0">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="dropdown-item journal-dropdown-item text-danger d-flex align-items-center gap-2">
-                                <i class="bi bi-trash" style="font-size: 0.9rem;"></i> Delete
-                            </button>
-                        </form>
+                        <button type="button" class="dropdown-item journal-dropdown-item text-danger d-flex align-items-center gap-2 w-100 text-start border-0 bg-transparent" onclick="openDashboardDeleteModal({{ $journal->id }})">
+                            <i class="bi bi-trash" style="font-size: 0.9rem;"></i> Delete
+                        </button>
                     </li>
                 </ul>
             </div>

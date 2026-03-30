@@ -3,7 +3,7 @@
         <div class="logo me-3">
             <img src="{{ asset('images/logo.png') }}" alt="The Journal Logo" class="header-logo-img" />
         </div>
-        <h1 class="m-0 sidebar-title" style="color: var(--navy-text); font-weight: 700;">App title</h1>
+        <h1 class="m-0 sidebar-title" style="color: var(--navy-text); font-weight: 700;">The Journal</h1>
     </div>
 
     <nav class="nav flex-column gap-3">

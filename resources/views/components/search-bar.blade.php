@@ -1,7 +1,16 @@
-<form action="{{ route('dashboard') }}" method="GET" class="search-bar d-flex align-items-center">
-    <div class="input-group search-input">
+{{-- Updated action to url()->current() so it works dynamically on both Dashboard AND Trash page! --}}
+<form action="{{ url()->current() }}" method="GET" class="search-bar d-flex align-items-center m-0">
+
+    {{-- Preserve active filters when searching --}}
+    @if(request('month'))
+        <input type="hidden" name="month" value="{{ request('month') }}">
+    @endif
+    @if(request('sort'))
+        <input type="hidden" name="sort" value="{{ request('sort') }}">
+    @endif
+
+    <div class="input-group search-input m-0">
         <span class="input-group-text search-icon-wrapper border-end-0">
-            {{-- Assuming you are using Bootstrap Icons --}}
             <i class="bi bi-search search-icon"></i>
         </span>
 

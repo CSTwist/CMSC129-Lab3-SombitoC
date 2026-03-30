@@ -6,15 +6,19 @@ use App\Models\Journal;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
 
 class JournalController extends Controller
 {
-    // Display dashboard with search functionality
     public function index(Request $request)
     {
         $query = Journal::where('user_id', Auth::id());
 
-        // Process search if query parameter exists
+        $allUserJournals = Journal::where('user_id', Auth::id())->latest()->get();
+        $availableMonths = $allUserJournals->groupBy(function($journal) {
+            return $journal->created_at->format('F Y');
+        })->keys();
+
         if ($request->has('search') && $request->search != '') {
             $searchTerm = $request->search;
             $query->where(function($q) use ($searchTerm) {
@@ -23,29 +27,48 @@ class JournalController extends Controller
             });
         }
 
-        $allJournals = Journal::where('user_id', Auth::id())->get();
-        $filteredJournals = $query->latest()->get();
+        if ($request->has('month') && $request->month != '') {
+            try {
+                $date = Carbon::createFromFormat('F Y', $request->month);
+                $query->whereMonth('created_at', $date->month)
+                      ->whereYear('created_at', $date->year);
+            } catch (\Exception $e) {
+                // Ignore
+            }
+        }
 
-        // Group the filtered journals by Month and Year (e.g., "March 2026")
+        if ($request->has('sort') && $request->sort == 'oldest') {
+            $filteredJournals = $query->oldest()->get();
+        } else {
+            $filteredJournals = $query->latest()->get();
+        }
+
         $groupedJournals = $filteredJournals->groupBy(function($journal) {
             return $journal->created_at->format('F Y');
         });
 
-        return view('layouts/dashboard', [
-            'journals' => $allJournals,
-            'totalJournals' => $allJournals->count(),
+        if ($request->ajax()) {
+            return view('partials.journal-list', [
+                'journals' => $allUserJournals,
+                'groupedJournals' => $groupedJournals,
+                'isLoading' => false
+            ])->render();
+        }
+
+        return view('layouts.dashboard', [
+            'journals' => $allUserJournals,
+            'totalJournals' => $allUserJournals->count(),
             'groupedJournals' => $groupedJournals,
+            'availableMonths' => $availableMonths,
             'isLoading' => false
         ]);
     }
 
-    // Show create page
     public function create()
     {
         return view('journals/create');
     }
 
-    // Store new journal
     public function store(Request $request)
     {
         $request->validate([
@@ -62,7 +85,16 @@ class JournalController extends Controller
         return redirect()->route('dashboard')->with('success', 'Journal created!');
     }
 
-    // NEW: Show edit page
+    // NEW: Show a read-only view of a journal
+    public function show($id)
+    {
+        // Use withTrashed() so you can also view entries that are in the trash bin!
+        $journal = Journal::withTrashed()->findOrFail($id);
+        $this->authorizeJournal($journal);
+
+        return view('layouts/view-entry', compact('journal'));
+    }
+
     public function edit($id)
     {
         $journal = Journal::findOrFail($id);
@@ -71,7 +103,6 @@ class JournalController extends Controller
         return view('journals/edit', compact('journal'));
     }
 
-    // Update journal
     public function update(Request $request, $id)
     {
         $journal = Journal::findOrFail($id);
@@ -90,7 +121,6 @@ class JournalController extends Controller
         return redirect()->route('dashboard')->with('success', 'Journal updated!');
     }
 
-    // Delete journal (Soft Delete)
     public function destroy($id)
     {
         $journal = Journal::findOrFail($id);
@@ -103,15 +133,26 @@ class JournalController extends Controller
 
     // --- TRASH FUNCTIONALITY ---
 
-    public function trash()
+    public function trash(Request $request)
     {
-        $trashedJournals = Journal::onlyTrashed()
-            ->where('user_id', Auth::id())
-            ->latest('deleted_at')
-            ->get();
+        $query = Journal::onlyTrashed()->where('user_id', Auth::id());
+
+        if ($request->has('search') && $request->search != '') {
+            $searchTerm = $request->search;
+            $query->where(function($q) use ($searchTerm) {
+                $q->where('title', 'like', '%' . $searchTerm . '%')
+                  ->orWhere('content', 'like', '%' . $searchTerm . '%');
+            });
+        }
+
+        $trashedJournals = $query->latest('deleted_at')->get();
+
+        $groupedJournals = $trashedJournals->groupBy(function($journal) {
+            return $journal->deleted_at->format('F Y');
+        });
 
         return view('layouts/recently-deleted', [
-            'trashedJournals' => $trashedJournals,
+            'groupedJournals' => $groupedJournals,
             'hasDeletedItems' => $trashedJournals->isNotEmpty()
         ]);
     }
@@ -133,14 +174,14 @@ class JournalController extends Controller
 
         $journal->forceDelete();
 
-        return redirect()->route('recently-deleted')->with('success', 'Journal permanently deleted!');
+        return redirect()->route('recently-deleted')->with('success', 'The journal entry was permanently deleted.');
     }
 
     public function emptyTrash()
     {
         Journal::onlyTrashed()->where('user_id', Auth::id())->forceDelete();
 
-        return redirect()->route('recently-deleted')->with('success', 'Trash Emptied!');
+        return redirect()->route('recently-deleted')->with('success', 'All trash has been permanently deleted.');
     }
 
     private function authorizeJournal($journal)

@@ -13,11 +13,16 @@ return new class extends Migration
     {
         Schema::create('journals', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-            $table->string('title');
-            $table->text('content');
+
+            // 5 Fields for the Rubric (excluding id, timestamps, softDeletes)
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete(); // 1
+            $table->string('title');                                        // 2
+            $table->text('content');                                        // 3
+            $table->string('mood')->nullable();                             // 4
+            $table->boolean('is_favorite')->default(false);                 // 5
+
             $table->timestamps();
-            $table->softDeletes(); // Added soft deletes column (deleted_at)
+            $table->softDeletes();
         });
     }
 
