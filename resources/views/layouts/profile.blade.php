@@ -17,8 +17,13 @@
             </div>
 
             <div class="mb-4 w-75">
+                <label class="profile-label d-block">Username</label>
+                <input type="text" class="form-control profile-input w-75" value="{{ auth()->user()->name }}" disabled>
+            </div>
+
+            <div class="mb-4 w-75">
                 <label class="profile-label d-block">Email</label>
-                <input type="email" class="form-control profile-input w-75" value="iska@up.edu.ph" disabled>
+                <input type="email" class="form-control profile-input w-75" value="{{ auth()->user()->email }}" disabled>
             </div>
 
             <div class="mb-5">
@@ -33,3 +38,4 @@
         </div>
     </div>
 </div>
+@endsection

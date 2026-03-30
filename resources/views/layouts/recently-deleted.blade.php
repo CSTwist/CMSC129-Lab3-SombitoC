@@ -15,24 +15,46 @@
             <x-search-bar />
         </div>
 
-        @php $hasDeletedItems = false; @endphp
-
         @if(!$hasDeletedItems)
             <div class="empty-trash-container">
                 <i class="bi bi-trash empty-trash-icon"></i>
                 <h3 style="font-weight: 600; margin-bottom: 5px;">Nothing in the trash</h3>
                 <p class="text-muted mb-4">Recently deleted entries will appear here</p>
-                <a href="{{ route('dashboard') }}" class="btn btn-pink rounded-pill px-4 py-2">Back to my journal entries</a>
+                <a href="{{ route('dashboard') }}" class="btn btn-pink rounded-pill px-4 py-2 text-decoration-none">Back to my journal entries</a>
             </div>
-
         @else
-            {{-- Display list of recently deleted entries here --}}
             <div class="trash-warning-banner mb-4">
                 <span style="font-weight: 500;">Entries that have been in Trash will be permanently deleted after 30 days.</span>
                 <button class="btn btn-danger-custom" data-bs-toggle="modal" data-bs-target="#emptyTrashModal">Empty Trash now</button>
             </div>
 
-            @endif
+            @foreach($trashedJournals as $journal)
+                <div class="trash-card card w-75 mb-3">
+                    <div class="d-flex w-100">
+                        <div class="trash-date-box text-center">
+                            <span class="trash-date-day">{{ $journal->deleted_at->format('M') }}</span>
+                            <span class="trash-date-num">{{ $journal->deleted_at->format('d') }}</span>
+                        </div>
+                        <div class="trash-content d-flex flex-column justify-content-center">
+                            <h5 class="trash-title">{{ $journal->title }}</h5>
+                            <p class="trash-snippet mb-2">{{ \Illuminate\Support\Str::limit(strip_tags($journal->content), 100) }}</p>
+
+                            <div class="d-flex gap-2 mt-2">
+                                <form action="{{ route('journals.restore', $journal->id) }}" method="POST">
+                                    @csrf
+                                    <button class="btn btn-sm btn-pink rounded-pill px-3">Restore</button>
+                                </form>
+                                <form action="{{ route('journals.forceDelete', $journal->id) }}" method="POST">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button class="btn btn-sm btn-danger-custom rounded-pill px-3">Delete Forever</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @endforeach
+        @endif
     </div>
 </div>
 
@@ -49,7 +71,11 @@
 
             <div class="d-flex justify-content-center gap-3">
                 <button type="button" class="btn btn-gray" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-danger-custom" style="background-color: #E07A5F;">Delete all entries</button>
+                <form action="{{ route('trash.empty') }}" method="POST">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="btn btn-danger-custom" style="background-color: #E07A5F;">Delete all entries</button>
+                </form>
             </div>
         </div>
     </div>

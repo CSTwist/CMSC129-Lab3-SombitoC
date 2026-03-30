@@ -8,7 +8,7 @@
         <div class="d-flex align-items-center">
             <x-left-sidebar />
         </div>
-        
+
         {{-- Main Content Area --}}
         <div class="main-container flex-grow-1">
 
@@ -32,7 +32,8 @@
                         </div>
                     @else
                         @foreach($filteredJournals as $journal)
-                            @include('partials.journal-entry', ['journal' => $journal])
+                            {{-- Replaced missing partial include with correct component directive --}}
+                            <x-journal :journal="$journal" />
                         @endforeach
                     @endif
                 </div>
