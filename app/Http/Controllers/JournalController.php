@@ -26,10 +26,15 @@ class JournalController extends Controller
         $allJournals = Journal::where('user_id', Auth::id())->get();
         $filteredJournals = $query->latest()->get();
 
+        // Group the filtered journals by Month and Year (e.g., "March 2026")
+        $groupedJournals = $filteredJournals->groupBy(function($journal) {
+            return $journal->created_at->format('F Y');
+        });
+
         return view('layouts/dashboard', [
             'journals' => $allJournals,
             'totalJournals' => $allJournals->count(),
-            'filteredJournals' => $filteredJournals,
+            'groupedJournals' => $groupedJournals,
             'isLoading' => false
         ]);
     }
@@ -57,11 +62,25 @@ class JournalController extends Controller
         return redirect()->route('dashboard')->with('success', 'Journal created!');
     }
 
+    // NEW: Show edit page
+    public function edit($id)
+    {
+        $journal = Journal::findOrFail($id);
+        $this->authorizeJournal($journal);
+
+        return view('journals/edit', compact('journal'));
+    }
+
     // Update journal
     public function update(Request $request, $id)
     {
         $journal = Journal::findOrFail($id);
         $this->authorizeJournal($journal);
+
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'content' => 'required|string',
+        ]);
 
         $journal->update([
             'title' => $request->title,
@@ -77,14 +96,13 @@ class JournalController extends Controller
         $journal = Journal::findOrFail($id);
         $this->authorizeJournal($journal);
 
-        $journal->delete(); // Moves to trash instead of permanently deleting
+        $journal->delete();
 
         return redirect()->route('dashboard')->with('success', 'Journal moved to trash!');
     }
 
     // --- TRASH FUNCTIONALITY ---
 
-    // Load recently deleted items
     public function trash()
     {
         $trashedJournals = Journal::onlyTrashed()
@@ -98,7 +116,6 @@ class JournalController extends Controller
         ]);
     }
 
-    // Restore an item from the trash
     public function restore($id)
     {
         $journal = Journal::onlyTrashed()->findOrFail($id);
@@ -109,7 +126,6 @@ class JournalController extends Controller
         return redirect()->route('recently-deleted')->with('success', 'Journal restored!');
     }
 
-    // Permanently delete a single item
     public function forceDelete($id)
     {
         $journal = Journal::onlyTrashed()->findOrFail($id);
@@ -120,7 +136,6 @@ class JournalController extends Controller
         return redirect()->route('recently-deleted')->with('success', 'Journal permanently deleted!');
     }
 
-    // Permanently delete everything in the trash
     public function emptyTrash()
     {
         Journal::onlyTrashed()->where('user_id', Auth::id())->forceDelete();
@@ -128,7 +143,6 @@ class JournalController extends Controller
         return redirect()->route('recently-deleted')->with('success', 'Trash Emptied!');
     }
 
-    // Security check
     private function authorizeJournal($journal)
     {
         if ($journal->user_id !== Auth::id()) {

@@ -25,7 +25,10 @@ Route::middleware('auth')->group(function () {
     // Dashboard & Journal Entries
     Route::get('/dashboard', [JournalController::class, 'index'])->name('dashboard');
     Route::get('/journals/create', [JournalController::class, 'create'])->name('journals/create');
-    Route::post('/journals/store', [JournalController::class, 'store'])->name('journals/store');
+    Route::post('/journals', [JournalController::class, 'store'])->name('journals/store');
+
+    // NEW: Route for the dedicated Edit page
+    Route::get('/journals/{id}/edit', [JournalController::class, 'edit'])->name('journals/edit');
     Route::put('/journals/{id}', [JournalController::class, 'update'])->name('journals/update');
     Route::delete('/journals/{id}', [JournalController::class, 'destroy'])->name('journals/delete');
 
@@ -36,7 +39,7 @@ Route::middleware('auth')->group(function () {
 
     // Recently Deleted (Trash)
     Route::get('/recently-deleted', [JournalController::class, 'trash'])->name('recently-deleted');
-    Route::post('/journals/{id}/restore', [JournalController::class, 'restore'])->name('journals.restore');
-    Route::delete('/journals/{id}/force', [JournalController::class, 'forceDelete'])->name('journals.forceDelete');
-    Route::delete('/trash/empty', [JournalController::class, 'emptyTrash'])->name('trash.empty');
+    Route::post('/journals/{id}/restore', [JournalController::class, 'restore'])->name('journals/restore');
+    Route::delete('/journals/{id}/force', [JournalController::class, 'forceDelete'])->name('journals/forceDelete');
+    Route::delete('/trash/empty', [JournalController::class, 'emptyTrash'])->name('trash/empty');
 });
