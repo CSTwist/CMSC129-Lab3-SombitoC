@@ -17,7 +17,7 @@
         👤
     </button>
 
-    {{-- The Dropdown Menu (dropdown-menu-end replaces align="end") --}}
+    {{-- The Dropdown Menu --}}
     <ul class="dropdown-menu dropdown-menu-end shadow-sm">
 
         {{-- Standard Links --}}

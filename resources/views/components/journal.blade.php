@@ -1,17 +1,48 @@
-<div class="card mb-3 w-75">
-    <div class="card-body">
-        <h5>{{ $journal->title }}</h5>
-        <p>{!! $journal->content !!}</p>
+<div class="journal-entry-card d-flex position-relative w-100" style="cursor: pointer; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.01)'" onmouseout="this.style.transform='scale(1)'" onclick="window.location.href='{{ route('journals/show', $journal->id) }}'">
 
-        <button class="btn btn-warning btn-sm"
-                onclick="openEditModal({{ $journal->id }}, '{{ $journal->title }}', `{!! addslashes($journal->content) !!}`)">
-            Edit
-        </button>
+    <div class="journal-date-box d-flex flex-column align-items-center justify-content-center">
+        <span class="journal-day">{{ strtoupper($journal->created_at->format('D')) }}</span>
+        <span class="journal-date">{{ $journal->created_at->format('d') }}</span>
+    </div>
 
-        <form action="{{ route('journals.delete', $journal->id) }}" method="POST" style="display:inline;">
-            @csrf
-            @method('DELETE')
-            <button class="btn btn-danger btn-sm">Delete</button>
-        </form>
+    <div class="journal-content-box p-4 flex-grow-1 position-relative">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+
+            <div class="d-flex align-items-center gap-2">
+                <h5 class="journal-title mb-0">{{ $journal->title }}</h5>
+
+                @if($journal->is_favorite)
+                    <i class="bi bi-star-fill text-warning" style="font-size: 1rem;"></i>
+                @endif
+
+                @if($journal->mood)
+                    <span class="badge rounded-pill ms-2" style="background-color: var(--lavender-btn); color: var(--navy-text); font-weight: 500; font-size: 0.75rem;">
+                        {{ $journal->mood }}
+                    </span>
+                @endif
+            </div>
+
+            <div class="dropdown ms-3" onclick="event.stopPropagation();">
+                <button class="btn btn-link text-dark p-0 text-decoration-none shadow-none dropdown-toggle-kebab" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-three-dots-vertical" style="font-size: 1.2rem; color: var(--navy-text);"></i>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end journal-dropdown-menu shadow-sm">
+                    <li>
+                        <a href="{{ route('journals/edit', $journal->id) }}" class="dropdown-item journal-dropdown-item d-flex align-items-center gap-2 text-decoration-none" style="color: var(--navy-text);">
+                            <i class="bi bi-pencil" style="font-size: 0.9rem;"></i> Edit
+                        </a>
+                    </li>
+                    <li>
+                        <button type="button" class="dropdown-item journal-dropdown-item text-danger d-flex align-items-center gap-2 w-100 text-start border-0 bg-transparent" onclick="openDashboardDeleteModal({{ $journal->id }})">
+                            <i class="bi bi-trash" style="font-size: 0.9rem;"></i> Delete
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <p class="journal-snippet mb-0">
+            {{ \Illuminate\Support\Str::limit(strip_tags($journal->content), 150) }}
+        </p>
     </div>
 </div>

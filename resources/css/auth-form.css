@@ -59,11 +59,10 @@ body, h1, h2, h3, h4, h5, h6, p, a, button, input, label {
 }
 
 .header-logo-img {
-    height: 60px; /* Adjust size as needed */
+    height: 60px;
     border-radius: 50px;
     width: auto;
     object-fit: contain;
-    /* Optional: add a slight shadow to match the title text */
     filter: drop-shadow(0 4px 4px rgba(0, 0, 0, 0.25));
 }
 
@@ -77,8 +76,8 @@ body, h1, h2, h3, h4, h5, h6, p, a, button, input, label {
 .auth-form-panel {
     background-color: var(--dirty_white);
     border-radius: 24px;
-    padding: 40px 35px; /* Added more breathing room */
-    box-shadow: 0 10px 25px rgba(0,0,0,0.05); /* Soft shadow for depth */
+    padding: 40px 35px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
     width: 100%;
 }
 
