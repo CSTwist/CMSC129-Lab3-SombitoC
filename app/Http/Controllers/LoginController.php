@@ -15,7 +15,7 @@ class LoginController extends Controller
     public function create(): View
     {
         // This returns your resources/views/login.blade.php file
-        return view('layouts/login');
+        return view('auth.login');
     }
 
     /**

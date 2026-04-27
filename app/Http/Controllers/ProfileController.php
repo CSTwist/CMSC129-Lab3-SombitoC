@@ -11,7 +11,7 @@ class ProfileController extends Controller
     // Show the profile page
     public function edit(Request $request)
     {
-        return view('layouts.profile', [
+        return view('profile', [
             'user' => $request->user(),
         ]);
     }

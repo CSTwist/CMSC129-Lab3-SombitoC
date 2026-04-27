@@ -55,7 +55,7 @@ class JournalController extends Controller
             ])->render();
         }
 
-        return view('layouts.dashboard', [
+        return view('dashboard', [
             'journals' => $allUserJournals,
             'totalJournals' => $allUserJournals->count(),
             'groupedJournals' => $groupedJournals,
@@ -157,7 +157,7 @@ class JournalController extends Controller
             return $journal->deleted_at->format('F Y');
         });
 
-        return view('layouts/recently-deleted', [
+        return view('journals.trash', [
             'groupedJournals' => $groupedJournals,
             'hasDeletedItems' => $trashedJournals->isNotEmpty()
         ]);
