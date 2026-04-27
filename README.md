@@ -1,223 +1,78 @@
-# The Journal
+# The Journal (AI-Powered)
 
-The Journal is a digitalized personal journal application built with Laravel and MVC pattern that allows users to write, read, edit, and delete their journal entries.
+The Journal is a digitalized personal journal application enhanced with AI integration. Built with Laravel and the MVC pattern, it allows users to manage their journal entries through a traditional UI and an intelligent AI Assistant.
+
+## 🤖 Lab 3: AI Integration Features
+
+### 1. AI Assistant (Expanded Requirements)
+The application features a floating AI Assistant widget that can handle:
+*   **Natural Language Inquiries**: Ask about your journals (e.g., "What did I write about lunch yesterday?").
+*   **Full CRUD Operations**: 
+    *   **Create**: "Add a new entry about my coding session."
+    *   **Read**: "Show me my latest journals."
+    *   **Update**: "Mark my entry about the exam as a favorite."
+    *   **Delete**: "Remove the draft entry." (Requires confirmation).
+*   **Trash Management**: "What's in my trash?" or "Restore the entry about the beach."
+*   **Context Awareness**: The AI maintains a conversation history (last 10 messages), allowing for follow-up questions.
+*   **Safety & UX**: Destructive operations (Delete/Update) trigger a confirmation prompt from the AI.
+
+### 2. AI Model Used
+*   **Primary**: Google Gemini 1.5 Flash (via Google AI Studio)
+*   **Fallback**: Gemini 1.0 Pro
+*   **Logic**: Implemented a robust fallback mechanism that automatically switches models if the primary one fails or hits rate limits.
+
+---
 
 ## ⚙️ Installation and Setup
 **Step 1. Clone the repository**
-* Open *Command Prompt* in Windows or *Terminal* on Mac.
-* Type or copy these commands below.
 ```bash
-git clone https://github.com/CMSC-129-Laboratory-Assignments/CMSC129-Lab2-SombitoC-DelaCruzSM
-cd CMSC129-Lab2-SombitoC-DelaCruzSM
+git clone https://github.com/Chak/CMSC129-Lab3-SombitoC
+cd CMSC129-Lab3-SombitoC
 ```
 
-**Step 2. Install PHP and Node dependencies**
-```
-composer install      # installs the PHP packages
-npm install           # This will download the node_modules folder
+**Step 2. Install Dependencies**
+```bash
+composer install
+npm install
+npm run build
 ```
 
 **Step 3. Setup Environment Variables**
-* Duplicate the `.env.example` file from the root directory and rename it to `.env`.
-* Generate the application key with this command:
-```
-php artisan key:generate
-```
-The generated key will be automatically pasted in your `.env` file.
+*   Duplicate `.env.example` to `.env`.
+*   Generate key: `php artisan key:generate`.
+*   **AI Setup**: Get a Gemini API Key from [Google AI Studio](https://aistudio.google.com/) and add it to your `.env`:
+    ```env
+    GEMINI_API_KEY=your_actual_api_key_here
+    ```
 
-### Run Frontend
-To compile the CSS and JS files via Vite, open a new terminal and run this command:
-```
-npm run dev
-```
-
----
-
-## 🗃️ Database Setup Guide (PostgreSQL Database via Supabase)
-For this application, we use PostgreSQL hosted on **Supabase**.
-
-To successfully connect the application to the database, you must configure your environment variables.
-
-Step 1. Open your .env file
-Open the .env file you created during the installation process in your code editor.
-
-Step 2. Update Database Configuration
-Locate the block of variables starting with DB_CONNECTION. Replace the default MySQL/SQLite settings with the following Supabase PostgreSQL credentials:
-
-DB_CONNECTION=pgsql
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_DATABASE=laravel
-DB_USERNAME=root
-DB_PASSWORD=
-
-
-(Note: Ensure there are no spaces around the = signs).
----
-
-### Migration Commands
-* Built the database tables using this command:
-```
+**Step 4. Database Setup**
+```bash
 php artisan migrate:fresh --seed
 ```
-
-### Run the Server
-* Open a new terminal and run this command:
-```
-php artisan serve
-```
-* To open the application, *Ctrl + click* the link provided by the server:
-    * `http://localhost:8000`
-* To stop the application from running, type *Ctrl + c*.
+*Note: The seeder populates the database with 20 dummy records (15 active, 5 trashed) to test the AI capabilities.*
 
 ---
 
-## 📸 Screenshots
-
-![Dashboard View](/public/images/screenshots/dashboard.png)
-**Dashboard Page**
-
-![Recently Deleted View](/public/images/screenshots/recently_deleted.png)
-**Recently Deleted Page**
-
----
-
-## 🚀 Features Implemented
-* **User Authentication:** Secure signup, login, and logout functionality.
-* **Journal Entry CRUD:** Create, read, update, and delete personal journal entries.
-* **Dashboard Page:** Display sidebar and the journal entries written by the user.
-* **Profile Management:** Users can update their username, email, and change their passwords.
-* **Trash & Recovery (Soft & Hard Deletes):** Deleted entries are moved to a "Recently Deleted" page where journal entries can be restored or permanently deleted.
+## 💡 Example Queries to Try
+*   "Show me my latest 5 journals."
+*   "Did I mention anything about 'pizza' in my entries?"
+*   "Summarize my journals from this week."
+*   "Create a new entry titled 'Lab 3 Progress' with content 'I finished the AI integration today!'"
+*   "Delete my entry about 'Draft notes'."
+*   "Restore the journal I just deleted."
 
 ---
 
-## 📂 MVC Architecture & Project Structure
+## 📸 AI Assistant in Action
 
-This application follows Laravel's **Model-View-Controller (MVC)** architecture to separate concerns and keep the codebase clean:
-* **Models (`app/Models`):** Handle data logic, database interactions, and relationships (e.g., `User` and `Journal` models).
-* **Views (`resources/views`):** The frontend Blade templates that display the UI to the user.
-* **Controllers (`app/Http/Controllers`):** The middleman that processes incoming HTTP requests, fetches data from the Models, and passes it to the Views.
+![AI Chatbot](/public/images/screenshots/dashboard.png)
+*AI Assistant integrated as a floating widget on the Dashboard.*
 
-Here is an overview of our project structure:
+---
 
-# Repository Structure
-
-```
-├── app
-│   ├── Http
-│   │   └── Controllers
-│   │       ├── Controller.php
-│   │       ├── JournalController.php
-│   │       ├── LoginController.php
-│   │       └── SignupController.php
-│   │       └── SignupController.php
-│   ├── Models
-│   │   ├── Journal.php
-│   │   └── User.php
-│   └── Providers
-│       └── AppServiceProvider.php
-├── bootstrap
-│   ├── cache
-│   │   └── .gitignore
-│   ├── app.php
-│   └── providers.php
-├── config
-│   ├── app.php
-│   ├── auth.php
-│   ├── cache.php
-│   ├── database.php
-│   ├── filesystems.php
-│   ├── logging.php
-│   ├── mail.php
-│   ├── queue.php
-│   ├── services.php
-│   └── session.php
-├── database
-│   ├── factories
-│   │   └── UserFactory.php
-│   ├── migrations
-│   │   ├── 0001_01_01_000000_create_users_table.php
-│   │   └── 2026_03_21_124204_create_journals_table.php
-│   ├── seeders
-│   │   └── DatabaseSeeder.php
-│   └── .gitignore
-├── public
-│   ├── images
-│   │   ├── background.jpg
-│   │   ├── journal.png
-│   │   └── logo.png
-│   ├── .htaccess
-│   ├── favicon.ico
-│   ├── index.php
-│   └── robots.txt
-├── resources
-│   ├── css
-│   │   ├── app.css
-│   │   ├── auth-form.css
-│   │   ├── dashboard-content.css
-│   │   ├── left-sidebar.css
-│   │   ├── profile-page.css
-│   │   ├── recently-deleted.css
-│   │   └── search-bar.css
-│   ├── js
-│   │   ├── app.js
-│   │   └── bootstrap.js
-│   └── views
-│       ├── components
-│       │   ├── auth-form.blade.php
-│       │   ├── journal-summary.blade.php
-│       │   ├── journal.blade.php
-│       │   ├── left-sidebar.blade.php
-│       │   ├── profile-button.blade.php
-│       │   └── search-bar.blade.php
-│       └── layouts
-│           ├── app.blade.php
-│           ├── dashboard.blade.php
-│           ├── login.blade.php
-│           ├── profile.blade.php
-│           ├── recently-deleted.blade.php
-│           └── sign-up.blade.php
-├── routes
-│   ├── console.php
-│   └── web.php
-├── storage
-│   ├── app
-│   │   ├── private
-│   │   │   └── .gitignore
-│   │   ├── public
-│   │   │   └── .gitignore
-│   │   └── .gitignore
-│   ├── framework
-│   │   ├── cache
-│   │   │   ├── data
-│   │   │   │   └── .gitignore
-│   │   │   └── .gitignore
-│   │   ├── sessions
-│   │   │   └── .gitignore
-│   │   ├── testing
-│   │   │   └── .gitignore
-│   │   ├── views
-│   │   │   └── .gitignore
-│   │   └── .gitignore
-│   └── logs
-│       └── .gitignore
-├── tests
-│   ├── Feature
-│   │   └── ExampleTest.php
-│   ├── Unit
-│   │   └── ExampleTest.php
-│   └── TestCase.php
-├── .editorconfig
-├── .env.example
-├── .gitattributes
-├── .gitignore
-├── .styleci.yml
-├── artisan
-├── CHANGELOG.md
-├── composer.json
-├── composer.lock
-├── package-lock.json
-├── package.json
-├── phpunit.xml
-├── README.md
-└── vite.config.js
+## 🚀 Technical Implementation Details
+*   **Backend Proxy**: All AI calls are made through `AiChatController` to protect the API key.
+*   **Function Calling**: Uses Gemini's `functionDeclarations` to map natural language to internal Eloquent operations.
+*   **Session-based History**: Maintains context using Laravel's session store.
+*   **Markdown Support**: The chat interface uses `marked.js` to render formatted text from the AI.
+*   **Performance**: Implemented database indexing on `user_id` and `created_at` for faster AI data retrieval.

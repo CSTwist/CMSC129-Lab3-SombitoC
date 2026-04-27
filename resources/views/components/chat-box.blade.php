@@ -106,6 +106,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 appendMessage('ai', 'Error: ' + data.error);
             } else {
                 appendMessage('ai', data.response);
+                
+                // Trigger page refresh if AI performed a CRUD operation
+                if (data.refresh && typeof fetchFilteredJournals === 'function') {
+                    fetchFilteredJournals();
+                }
             }
 
         } catch (error) {
@@ -134,7 +139,21 @@ document.addEventListener('DOMContentLoaded', function() {
         
         contentDiv.style.maxWidth = '85%';
         contentDiv.style.fontSize = '0.9rem';
-        contentDiv.textContent = text;
+        
+        if (role === 'ai' && typeof marked !== 'undefined') {
+            contentDiv.innerHTML = marked.parse(text);
+            // Ensure any links open in new tab and are styled safely
+            contentDiv.querySelectorAll('a').forEach(a => {
+                a.target = '_blank';
+                a.rel = 'noopener noreferrer';
+            });
+            // Basic styles for parsed markdown elements
+            contentDiv.querySelectorAll('p').forEach(p => p.style.marginBottom = '0.5rem');
+            const lastP = contentDiv.querySelector('p:last-child');
+            if (lastP) lastP.style.marginBottom = '0';
+        } else {
+            contentDiv.textContent = text;
+        }
         
         div.appendChild(contentDiv);
         chatMessages.appendChild(div);
