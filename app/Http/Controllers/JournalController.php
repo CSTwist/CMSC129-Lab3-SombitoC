@@ -12,14 +12,32 @@ class JournalController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Journal::where('user_id', Auth::id());
+        $userId = Auth::id();
 
-        $allUserJournals = Journal::where('user_id', Auth::id())->latest()->get();
-        $availableMonths = $allUserJournals->groupBy(function($journal) {
-            return $journal->created_at->format('F Y');
-        })->keys();
+        // 1. Efficiently get available months for the filter dropdown
+        $availableMonths = Journal::where('user_id', $userId)
+            ->selectRaw("DISTINCT strftime('%F %Y', created_at) as month_year")
+            ->orderBy('created_at', 'desc')
+            ->pluck('month_year')
+            ->map(function($monthYear) {
+                // strftime '%F %Y' gives YYYY-MM-DD YYYY which is wrong for SQLite
+                // Actually SQLite strftime('%m %Y', created_at) would be better
+                return $monthYear;
+            });
 
-        if ($request->has('search') && $request->search != '') {
+        // Correction for SQLite month formatting:
+        $availableMonths = Journal::where('user_id', $userId)
+            ->selectRaw("DISTINCT strftime('%m %Y', created_at) as m_y")
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->map(function($row) {
+                return Carbon::createFromFormat('m Y', $row->m_y)->format('F Y');
+            })->unique()->values();
+
+        $query = Journal::where('user_id', $userId);
+
+        // 2. Apply Search
+        if ($request->filled('search')) {
             $searchTerm = $request->search;
             $query->where(function($q) use ($searchTerm) {
                 $q->where('title', 'like', '%' . $searchTerm . '%')
@@ -27,37 +45,43 @@ class JournalController extends Controller
             });
         }
 
-        if ($request->has('month') && $request->month != '') {
+        // 3. Apply Month Filter
+        if ($request->filled('month')) {
             try {
                 $date = Carbon::createFromFormat('F Y', $request->month);
                 $query->whereMonth('created_at', $date->month)
                       ->whereYear('created_at', $date->year);
             } catch (\Exception $e) {
-                // Ignore
+                // Ignore invalid date formats
             }
         }
 
-        if ($request->has('sort') && $request->sort == 'oldest') {
-            $filteredJournals = $query->oldest()->get();
+        // 4. Apply Sorting
+        if ($request->input('sort') === 'oldest') {
+            $query->oldest();
         } else {
-            $filteredJournals = $query->latest()->get();
+            $query->latest();
         }
 
-        $groupedJournals = $filteredJournals->groupBy(function($journal) {
+        // 5. Paginate results
+        $journals = $query->paginate(15)->withQueryString();
+
+        // Group the PAGINATED results for the view
+        $groupedJournals = $journals->groupBy(function($journal) {
             return $journal->created_at->format('F Y');
         });
 
         if ($request->ajax()) {
             return view('components/journal-list', [
-                'journals' => $allUserJournals,
+                'journals' => $journals,
                 'groupedJournals' => $groupedJournals,
                 'isLoading' => false
             ])->render();
         }
 
         return view('dashboard', [
-            'journals' => $allUserJournals,
-            'totalJournals' => $allUserJournals->count(),
+            'journals' => $journals,
+            'totalJournals' => Journal::where('user_id', $userId)->count(),
             'groupedJournals' => $groupedJournals,
             'availableMonths' => $availableMonths,
             'isLoading' => false
@@ -151,13 +175,14 @@ class JournalController extends Controller
             });
         }
 
-        $trashedJournals = $query->latest('deleted_at')->get();
+        $trashedJournals = $query->latest('deleted_at')->paginate(15);
 
         $groupedJournals = $trashedJournals->groupBy(function($journal) {
             return $journal->deleted_at->format('F Y');
         });
 
         return view('journals.trash', [
+            'journals' => $trashedJournals,
             'groupedJournals' => $groupedJournals,
             'hasDeletedItems' => $trashedJournals->isNotEmpty()
         ]);

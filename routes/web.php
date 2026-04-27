@@ -4,6 +4,7 @@ use App\Http\Controllers\JournalController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\SignupController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\AiChatController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -44,4 +45,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/journals/{id}/restore', [JournalController::class, 'restore'])->name('journals/restore');
     Route::delete('/journals/{id}/force', [JournalController::class, 'forceDelete'])->name('journals/forceDelete');
     Route::delete('/trash/empty', [JournalController::class, 'emptyTrash'])->name('trash/empty');
+
+    // AI Chat
+    Route::post('/chat/send', [AiChatController::class, 'sendMessage'])->name('chat/send');
 });

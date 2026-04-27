@@ -103,13 +103,17 @@
             const searchForm = searchInput ? searchInput.closest('form') : null;
             const container = document.getElementById('journal-list-container');
 
-            function fetchFilteredJournals() {
+            function fetchFilteredJournals(targetUrl = null) {
                 container.style.opacity = '0.4';
 
-                const url = new URL('{{ route('dashboard') }}');
-                if (monthSelect.value) url.searchParams.append('month', monthSelect.value);
-                if (sortSelect.value) url.searchParams.append('sort', sortSelect.value);
-                if (searchInput && searchInput.value) url.searchParams.append('search', searchInput.value);
+                const url = targetUrl ? new URL(targetUrl) : new URL('{{ route('dashboard') }}');
+                
+                // If targetUrl is not provided, build from current filters
+                if (!targetUrl) {
+                    if (monthSelect.value) url.searchParams.append('month', monthSelect.value);
+                    if (sortSelect.value) url.searchParams.append('sort', sortSelect.value);
+                    if (searchInput && searchInput.value) url.searchParams.append('search', searchInput.value);
+                }
 
                 fetch(url, {
                     headers: {
@@ -122,6 +126,7 @@
                     container.innerHTML = html;
                     container.style.opacity = '1';
                     window.history.pushState({}, '', url);
+                    attachPaginationListeners();
                 })
                 .catch(error => {
                     console.error('Error fetching filtered journals:', error);
@@ -129,8 +134,18 @@
                 });
             }
 
-            if (monthSelect) monthSelect.addEventListener('change', fetchFilteredJournals);
-            if (sortSelect) sortSelect.addEventListener('change', fetchFilteredJournals);
+            function attachPaginationListeners() {
+                const links = container.querySelectorAll('.pagination a');
+                links.forEach(link => {
+                    link.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        fetchFilteredJournals(this.href);
+                    });
+                });
+            }
+
+            if (monthSelect) monthSelect.addEventListener('change', () => fetchFilteredJournals());
+            if (sortSelect) sortSelect.addEventListener('change', () => fetchFilteredJournals());
 
             if (searchForm) {
                 searchForm.addEventListener('submit', function(e) {
@@ -141,9 +156,12 @@
                 let timeout = null;
                 searchInput.addEventListener('input', function() {
                     clearTimeout(timeout);
-                    timeout = setTimeout(fetchFilteredJournals, 400);
+                    timeout = setTimeout(() => fetchFilteredJournals(), 400);
                 });
             }
+
+            // Initial attachment
+            attachPaginationListeners();
         });
 
         function openDashboardDeleteModal(id) {
@@ -152,4 +170,6 @@
             modal.show();
         }
     </script>
+
+    <x-chat-box />
 @endsection

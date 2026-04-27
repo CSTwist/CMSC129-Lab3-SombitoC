@@ -15,4 +15,9 @@
         @endforeach
 
     @endforeach
+
+    {{-- Pagination Links --}}
+    <div class="d-flex justify-content-center mt-4 mb-4 pagination-container">
+        {{ $journals->links() }}
+    </div>
 @endif
