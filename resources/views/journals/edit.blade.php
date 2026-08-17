@@ -149,30 +149,92 @@
 
         <hr class="editor-divider">
 
-        <div class="editor-toolbar">
-            <i class="bi bi-type-bold"></i>
-            <span class="divider-vertical">|</span>
-            <i class="bi bi-type-italic"></i>
-            <span class="divider-vertical">|</span>
-            <i class="bi bi-type-underline"></i>
-            <span class="divider-vertical">|</span>
-            <i class="bi bi-fonts"></i>
-            <span class="divider-vertical">|</span>
-            <i class="bi bi-text-left"></i>
-            <span class="divider-vertical">|</span>
-            <i class="bi bi-text-center"></i>
-            <span class="divider-vertical">|</span>
-            <i class="bi bi-text-right"></i>
-            <span class="divider-vertical">|</span>
-            <i class="bi bi-justify"></i>
-            <span class="divider-vertical">|</span>
+        <div class="editor-toolbar d-flex align-items-center justify-content-between flex-wrap gap-2">
+            <div class="d-flex align-items-center gap-2">
+                <button type="button" class="btn btn-sm btn-light border-0 shadow-none toolbar-btn" data-format="bold" title="Bold (Ctrl+B)">
+                    <i class="bi bi-type-bold"></i>
+                </button>
+                <button type="button" class="btn btn-sm btn-light border-0 shadow-none toolbar-btn" data-format="italic" title="Italic (Ctrl+I)">
+                    <i class="bi bi-type-italic"></i>
+                </button>
+                <button type="button" class="btn btn-sm btn-light border-0 shadow-none toolbar-btn" data-format="heading" title="Heading">
+                    <i class="bi bi-type-h2"></i>
+                </button>
+                <span class="divider-vertical">|</span>
+                <button type="button" class="btn btn-sm btn-light border-0 shadow-none toolbar-btn" data-format="list" title="Bullet List">
+                    <i class="bi bi-list-ul"></i>
+                </button>
+                <button type="button" class="btn btn-sm btn-light border-0 shadow-none toolbar-btn" data-format="quote" title="Quote">
+                    <i class="bi bi-quote"></i>
+                </button>
+                <button type="button" class="btn btn-sm btn-light border-0 shadow-none toolbar-btn" data-format="code" title="Code">
+                    <i class="bi bi-code-slash"></i>
+                </button>
+            </div>
+            <div id="word-stats" class="text-muted" style="font-size: 0.85rem;">
+                <span id="word-count">0</span> words &bull; <span id="reading-time">1</span> min read
+            </div>
         </div>
 
-        <textarea name="content" class="form-control content-input" placeholder="Start writing here..." required>{{ old('content', $journal->content) }}</textarea>
+        <textarea name="content" id="journal-content" class="form-control content-input" placeholder="Start writing here..." required>{{ old('content', $journal->content) }}</textarea>
 
         <div class="save-btn-container">
-            <button type="submit" class="btn-save">Save entry</button>
+            <button type="submit" class="btn-save shadow-sm">Save entry</button>
         </div>
     </form>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const textarea = document.getElementById('journal-content');
+    const wordCountEl = document.getElementById('word-count');
+    const readingTimeEl = document.getElementById('reading-time');
+    const toolbarButtons = document.querySelectorAll('.toolbar-btn');
+
+    function updateStats() {
+        const text = textarea.value.trim();
+        const words = text.length > 0 ? text.split(/\s+/).length : 0;
+        const readTime = Math.max(1, Math.ceil(words / 200));
+        wordCountEl.textContent = words;
+        readingTimeEl.textContent = readTime;
+    }
+
+    textarea.addEventListener('input', updateStats);
+    updateStats();
+
+    function wrapSelection(prefix, suffix = prefix) {
+        const start = textarea.selectionStart;
+        const end = textarea.selectionEnd;
+        const text = textarea.value;
+        const selected = text.substring(start, end);
+        const replacement = prefix + (selected || 'text') + suffix;
+        textarea.value = text.substring(0, start) + replacement + text.substring(end);
+        textarea.focus();
+        textarea.setSelectionRange(start + prefix.length, start + replacement.length - suffix.length);
+        updateStats();
+    }
+
+    toolbarButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const format = btn.getAttribute('data-format');
+            if (format === 'bold') wrapSelection('**', '**');
+            else if (format === 'italic') wrapSelection('*', '*');
+            else if (format === 'heading') wrapSelection('### ', '');
+            else if (format === 'list') wrapSelection('- ', '');
+            else if (format === 'quote') wrapSelection('> ', '');
+            else if (format === 'code') wrapSelection('`', '`');
+        });
+    });
+
+    textarea.addEventListener('keydown', (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'b') {
+            e.preventDefault();
+            wrapSelection('**', '**');
+        } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'i') {
+            e.preventDefault();
+            wrapSelection('*', '*');
+        }
+    });
+});
+</script>
 @endsection

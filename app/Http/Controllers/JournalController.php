@@ -16,33 +16,18 @@ class JournalController extends Controller
 
         // 1. Efficiently get available months for the filter dropdown
         $availableMonths = Journal::where('user_id', $userId)
-            ->selectRaw("DISTINCT strftime('%F %Y', created_at) as month_year")
-            ->orderBy('created_at', 'desc')
-            ->pluck('month_year')
-            ->map(function($monthYear) {
-                // strftime '%F %Y' gives YYYY-MM-DD YYYY which is wrong for SQLite
-                // Actually SQLite strftime('%m %Y', created_at) would be better
-                return $monthYear;
-            });
-
-        // Correction for SQLite month formatting:
-        $availableMonths = Journal::where('user_id', $userId)
-            ->selectRaw("DISTINCT strftime('%m %Y', created_at) as m_y")
-            ->orderBy('created_at', 'desc')
-            ->get()
-            ->map(function($row) {
-                return Carbon::createFromFormat('m Y', $row->m_y)->format('F Y');
-            })->unique()->values();
+            ->latest('created_at')
+            ->pluck('created_at')
+            ->map(fn($date) => $date->format('F Y'))
+            ->unique()
+            ->values();
 
         $query = Journal::where('user_id', $userId);
 
         // 2. Apply Search
         if ($request->filled('search')) {
             $searchTerm = $request->search;
-            $query->where(function($q) use ($searchTerm) {
-                $q->where('title', 'like', '%' . $searchTerm . '%')
-                  ->orWhere('content', 'like', '%' . $searchTerm . '%');
-            });
+            $query->search($searchTerm);
         }
 
         // 3. Apply Month Filter
@@ -215,6 +200,26 @@ class JournalController extends Controller
         return redirect()->route('recently-deleted')->with('success', 'All trash has been permanently deleted.');
     }
 
+    public function toggleFavorite($id)
+    {
+        $journal = Journal::findOrFail($id);
+        $this->authorizeJournal($journal);
+
+        $journal->update([
+            'is_favorite' => !$journal->is_favorite,
+        ]);
+
+        if (request()->ajax() || request()->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'is_favorite' => $journal->is_favorite,
+                'message' => $journal->is_favorite ? 'Added to favorites' : 'Removed from favorites'
+            ]);
+        }
+
+        return back()->with('success', 'Favorite status updated.');
+    }
+
     private function authorizeJournal($journal)
     {
         if ($journal->user_id !== Auth::id()) {
@@ -222,3 +227,4 @@ class JournalController extends Controller
         }
     }
 }
+

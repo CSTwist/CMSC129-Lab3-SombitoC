@@ -53,6 +53,17 @@ class AiChatController extends Controller
     }
 
     /**
+     * Clear the AI chat session history.
+     */
+    public function clearHistory()
+    {
+        Session::forget('ai_chat_history');
+        Session::forget('ai_chat_refreshed');
+        return response()->json(['success' => true, 'message' => 'Chat history cleared.']);
+    }
+
+
+    /**
      * Recursive function to handle conversation including tool calls.
      */
     private function processConversation($depth = 0)
@@ -285,6 +296,71 @@ class AiChatController extends Controller
                     Session::put('ai_chat_refreshed', true);
                     return "Journal entry restored successfully.";
 
+                case 'search_journals':
+                    $query = $args['query'] ?? '';
+                    return Journal::where('user_id', $userId)
+                        ->search($query)
+                        ->latest()
+                        ->limit(10)
+                        ->get(['id', 'title', 'mood', 'is_favorite', 'created_at'])
+                        ->toArray();
+
+                case 'get_journal_stats':
+                    $activeCount = Journal::where('user_id', $userId)->count();
+                    $favoriteCount = Journal::where('user_id', $userId)->favorites()->count();
+                    $trashedCount = Journal::onlyTrashed()->where('user_id', $userId)->count();
+                    $moodStats = Journal::where('user_id', $userId)
+                        ->whereNotNull('mood')
+                        ->selectRaw('mood, count(*) as count')
+                        ->groupBy('mood')
+                        ->pluck('count', 'mood')
+                        ->toArray();
+                    $recentDates = Journal::where('user_id', $userId)
+                        ->latest()
+                        ->limit(7)
+                        ->get()
+                        ->map(fn($j) => $j->created_at->format('Y-m-d'))
+                        ->unique()
+                        ->values()
+                        ->toArray();
+                    return [
+                        'active_entries' => $activeCount,
+                        'favorites' => $favoriteCount,
+                        'trashed_entries' => $trashedCount,
+                        'mood_breakdown' => $moodStats,
+                        'recent_activity_dates' => $recentDates,
+                    ];
+
+                case 'generate_reflection_prompt':
+                    $theme = strtolower($args['theme'] ?? 'general');
+                    $prompts = [
+                        'gratitude' => [
+                            "What are 3 small blessings from today that you might have otherwise overlooked?",
+                            "Who is someone in your life you are deeply grateful for right now, and why?",
+                            "Reflect on a past struggle that turned into a blessing or lesson."
+                        ],
+                        'faith' => [
+                            "What is a Scripture verse or prayer that has brought peace to your heart recently?",
+                            "How have you seen God's faithfulness and guidance in your life this week?",
+                            "What burden or uncertainty can you entrust in prayer today?"
+                        ],
+                        'growth' => [
+                            "What is one positive habit you want to cultivate over the coming month?",
+                            "What challenge did you face today, and what did it teach you about your resilience?",
+                            "Where do you see yourself growing in wisdom, patience, or skill?"
+                        ],
+                        'peace' => [
+                            "What thoughts or anxieties can you release right now to restore inner peace?",
+                            "Describe a calm, comforting moment from this week and how it made you feel.",
+                            "What is one intentional step you can take today to slow down and rest?"
+                        ],
+                    ];
+                    $selectedCategory = $prompts[$theme] ?? $prompts['gratitude'];
+                    return [
+                        'theme' => $theme,
+                        'prompt' => $selectedCategory[array_rand($selectedCategory)],
+                    ];
+
                 default:
                     return "Error: Unknown tool '$name'.";
             }
@@ -308,6 +384,38 @@ class AiChatController extends Controller
                 ]
             ],
             [
+                'name' => 'search_journals',
+                'description' => 'Search the user\'s journal entries by keyword or phrase in title and content.',
+                'parameters' => [
+                    'type' => 'OBJECT',
+                    'properties' => [
+                        'query' => ['type' => 'STRING', 'description' => 'The search query or keyword.']
+                    ],
+                    'required' => ['query']
+                ]
+            ],
+            [
+                'name' => 'get_journal_stats',
+                'description' => 'Get overall statistics on user journals, mood distributions, and favorite counts.',
+                'parameters' => [
+                    'type' => 'OBJECT',
+                    'properties' => (object)[]
+                ]
+            ],
+            [
+                'name' => 'generate_reflection_prompt',
+                'description' => 'Generate thoughtful journaling and reflection prompts tailored by theme (gratitude, faith, growth, peace).',
+                'parameters' => [
+                    'type' => 'OBJECT',
+                    'properties' => [
+                        'theme' => [
+                            'type' => 'STRING',
+                            'description' => 'Theme for the prompt: gratitude, faith, growth, peace, or general.'
+                        ]
+                    ]
+                ]
+            ],
+            [
                 'name' => 'get_journal',
                 'description' => 'Get the full details and content of a specific journal entry by its ID.',
                 'parameters' => [
@@ -326,7 +434,7 @@ class AiChatController extends Controller
                     'properties' => [
                         'title' => ['type' => 'STRING', 'description' => 'The title of the entry.'],
                         'content' => ['type' => 'STRING', 'description' => 'The text content of the entry.'],
-                        'mood' => ['type' => 'STRING', 'description' => 'The mood associated with the entry.'],
+                        'mood' => ['type' => 'STRING', 'description' => 'The mood associated with the entry (e.g. Happy, Grateful, Peaceful, Reflective, Anxious, Sad).'],
                         'is_favorite' => ['type' => 'BOOLEAN', 'description' => 'Whether to mark it as a favorite.'],
                     ],
                     'required' => ['title', 'content']
@@ -388,25 +496,30 @@ class AiChatController extends Controller
         $user = Auth::user();
         $date = now()->toDayDateTimeString();
         
-        return "You are 'The Journal Assistant', a friendly and helpful AI companion integrated into a personal journaling application.
+        return "You are 'The Journal Assistant', a warm, empathetic, and intelligent AI companion integrated into a personal journaling application.
 Current Date: $date.
 User: {$user->name} ({$user->email}).
 
 Your Goal:
-- Help the user manage their journals via natural language.
-- Answer questions about their thoughts and experiences recorded in their journals.
-- Perform CRUD operations efficiently.
+- Help the user manage and reflect on their journals via natural language.
+- Answer questions about their thoughts, milestones, and reflections.
+- Provide uplifting reflection prompts, mood summaries, and statistics.
+- Perform CRUD operations safely.
 
 Behavioral Rules:
 1. CONTEXT: You have access to conversation history. Roles MUST alternate strictly (user -> model -> function -> model -> user).
-2. INQUIRIES: If a user asks 'What did I write about lunch?', use 'list_journals' first, then 'get_journal' for relevant IDs to find the answer.
+2. INQUIRIES & SEARCH:
+   - Use 'search_journals' when looking for specific topics, keywords, or questions.
+   - Use 'get_journal_stats' when the user asks for summaries, moods, writing habits, or overall counts.
+   - Use 'generate_reflection_prompt' when the user wants writing inspiration, devotionals, or prompts.
 3. CRUD:
    - To CREATE: Use 'create_journal'.
    - To UPDATE/DELETE: Use 'update_journal' or 'delete_journal'.
-   - SAFETY: You MUST ask for confirmation (e.g., 'Are you sure you want to delete this entry?') before performing destructive actions (Update or Delete), unless the user has already explicitly confirmed it in the current context.
-4. FEEDBACK: Always confirm success or explain failure after a tool call.
-5. TONE: Be warm, empathetic, and concise. Don't be too robotic.";
+   - SAFETY: You MUST ask for confirmation before performing destructive actions (Update or Delete), unless the user has already explicitly confirmed it in the current context.
+4. FEEDBACK: Always confirm success or explain failure clearly after a tool call.
+5. TONE: Be encouraging, supportive, empathetic, and concise. Format lists with clear markdown.";
     }
+
 
     /**
      * Get chat history from session.

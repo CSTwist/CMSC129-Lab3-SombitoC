@@ -169,6 +169,33 @@
             let modal = new bootstrap.Modal(document.getElementById('dashboardDeleteModal'));
             modal.show();
         }
+
+        function toggleJournalFavorite(button, id) {
+            const icon = button.querySelector('i');
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '{{ csrf_token() }}';
+
+            fetch(`/journals/${id}/favorite`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Accept': 'application/json'
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    if (data.is_favorite) {
+                        icon.className = 'bi bi-star-fill text-warning';
+                        button.title = 'Favorited';
+                    } else {
+                        icon.className = 'bi bi-star text-muted';
+                        button.title = 'Add to favorites';
+                    }
+                }
+            })
+            .catch(err => console.error('Failed to toggle favorite:', err));
+        }
     </script>
 
     <x-chat-box />

@@ -43,9 +43,12 @@ Route::middleware('auth')->group(function () {
     // Recently Deleted (Trash)
     Route::get('/recently-deleted', [JournalController::class, 'trash'])->name('recently-deleted');
     Route::post('/journals/{id}/restore', [JournalController::class, 'restore'])->name('journals/restore');
+    Route::post('/journals/{id}/favorite', [JournalController::class, 'toggleFavorite'])->name('journals/favorite');
     Route::delete('/journals/{id}/force', [JournalController::class, 'forceDelete'])->name('journals/forceDelete');
     Route::delete('/trash/empty', [JournalController::class, 'emptyTrash'])->name('trash/empty');
 
     // AI Chat
     Route::post('/chat/send', [AiChatController::class, 'sendMessage'])->name('chat/send');
+    Route::post('/chat/clear', [AiChatController::class, 'clearHistory'])->name('chat/clear');
 });
+

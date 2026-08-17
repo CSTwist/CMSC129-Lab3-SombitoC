@@ -1,4 +1,4 @@
-<div class="journal-entry-card d-flex position-relative w-100" style="cursor: pointer; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.01)'" onmouseout="this.style.transform='scale(1)'" onclick="window.location.href='{{ route('journals/show', $journal->id) }}'">
+<div class="journal-entry-card d-flex position-relative w-100" style="cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'" onclick="window.location.href='{{ route('journals/show', $journal->id) }}'">
 
     <div class="journal-date-box d-flex flex-column align-items-center justify-content-center">
         <span class="journal-day">{{ strtoupper($journal->created_at->format('D')) }}</span>
@@ -8,18 +8,22 @@
     <div class="journal-content-box p-4 flex-grow-1 position-relative">
         <div class="d-flex justify-content-between align-items-start mb-2">
 
-            <div class="d-flex align-items-center gap-2">
+            <div class="d-flex align-items-center gap-2 flex-wrap">
                 <h5 class="journal-title mb-0">{{ $journal->title }}</h5>
 
-                @if($journal->is_favorite)
-                    <i class="bi bi-star-fill text-warning" style="font-size: 1rem;"></i>
-                @endif
+                <button type="button" class="btn btn-sm p-0 border-0 shadow-none favorite-toggle-btn" data-id="{{ $journal->id }}" onclick="event.stopPropagation(); toggleJournalFavorite(this, {{ $journal->id }})" title="{{ $journal->is_favorite ? 'Favorited' : 'Add to favorites' }}">
+                    <i class="bi {{ $journal->is_favorite ? 'bi-star-fill text-warning' : 'bi-star text-muted' }}" style="font-size: 1.05rem;"></i>
+                </button>
 
                 @if($journal->mood)
-                    <span class="badge rounded-pill ms-2" style="background-color: var(--lavender-btn); color: var(--navy-text); font-weight: 500; font-size: 0.75rem;">
-                        {{ $journal->mood }}
+                    <span class="badge rounded-pill" style="background-color: var(--lavender-btn); color: var(--navy-text); font-weight: 500; font-size: 0.75rem;">
+                        {{ $journal->mood_emoji }} {{ $journal->mood }}
                     </span>
                 @endif
+
+                <span class="text-muted small" style="font-size: 0.75rem;">
+                    &bull; {{ $journal->reading_time }} min read
+                </span>
             </div>
 
             <div class="dropdown ms-3" onclick="event.stopPropagation();">
@@ -41,8 +45,9 @@
             </div>
         </div>
 
-        <p class="journal-snippet mb-0">
-            {{ \Illuminate\Support\Str::limit(strip_tags($journal->content), 150) }}
+        <p class="journal-snippet mb-0 text-muted" style="line-height: 1.5;">
+            {{ \Illuminate\Support\Str::limit(strip_tags($journal->content), 160) }}
         </p>
     </div>
 </div>
+
